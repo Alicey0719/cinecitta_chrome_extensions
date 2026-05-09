@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Cinecitta Mypage Mod",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnuC8ee54Er/MWBYafCbfTewzn6JPidt5bT5JUpTZiZpR+X9sEbKYLnoN14D29F+sMOCU/OInLRyTQQmG6EEdhqb7Ix0kijX3FcJOdx9PRyPb2VXI7Rk6Jq6eBbczZoX8RrKFBmJs1mjm7a4bfs05NjF/TVsoFraQr0DvGlahAp4U6gfa8o8zXfUWuA7JWny6jABjc5Kx22Q9wBEjGflgXH/Tn8Y24ktAzfDKNPe3truy9nFzUidpMBBfq6I1zRyg03gbrN8T2/ksLym1bBlv1Rl+0ldwB7rabgFRUKAwioJBuol+pXj6KwiOdSfyckFygo9maU90p5A9S8LuhP+PmwIDAQAB",
   "version": "0.0.2",
   "description": "チネチッタ購入履歴ページに映画・スクリーンへのコメントを追加できます",
   "permissions": [
