@@ -1,7 +1,8 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'cinecitta_comments_v1';
+  const LEGACY_KEY = 'cinecitta_comments_v1'; // 旧 local storage キー（移行用）
+  const RECORD_PREFIX = 'cc_r_';              // sync storage のレコードキープレフィックス
   const PROCESSED_ATTR = 'data-cc-processed';
 
   // ============================================================
@@ -97,18 +98,48 @@
   // Storage
   // ============================================================
 
+  // sync storage からレコードを全件読み込む。
+  // sync が空なら旧 local storage を確認して自動マイグレーションする。
   function loadAllData() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(STORAGE_KEY, (result) => {
-        const d = result[STORAGE_KEY];
-        resolve(d?.records ? d : { version: 1, records: {} });
+      chrome.storage.sync.get(null, (syncItems) => {
+        const records = {};
+        for (const [k, v] of Object.entries(syncItems || {})) {
+          if (k.startsWith(RECORD_PREFIX)) {
+            records[k.slice(RECORD_PREFIX.length)] = v;
+          }
+        }
+
+        if (Object.keys(records).length > 0) {
+          resolve({ version: 1, records });
+          return;
+        }
+
+        // sync が空 → 旧 local storage からマイグレーション
+        chrome.storage.local.get(LEGACY_KEY, (localResult) => {
+          const legacy = localResult[LEGACY_KEY];
+          if (!legacy?.records || Object.keys(legacy.records).length === 0) {
+            resolve({ version: 1, records: {} });
+            return;
+          }
+
+          const toSet = {};
+          for (const [id, rec] of Object.entries(legacy.records)) {
+            toSet[`${RECORD_PREFIX}${id}`] = rec;
+          }
+          chrome.storage.sync.set(toSet, () => {
+            if (!chrome.runtime.lastError) {
+              chrome.storage.local.remove(LEGACY_KEY);
+            }
+            resolve({ version: 1, records: legacy.records });
+          });
+        });
       });
     });
   }
 
-  async function saveRecord(recordId, recordData, comments) {
-    const allData = await loadAllData();
-    allData.records[recordId] = {
+  function saveRecord(recordId, recordData, comments) {
+    const record = {
       movieTitle: recordData.movieTitle,
       viewingDate: recordData.viewingDate,
       screen: recordData.screen,
@@ -118,7 +149,19 @@
       updatedAt: new Date().toISOString(),
     };
     return new Promise((resolve, reject) => {
-      chrome.storage.local.set({ [STORAGE_KEY]: allData }, () => {
+      chrome.storage.sync.set({ [`${RECORD_PREFIX}${recordId}`]: record }, () => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  function deleteRecord(recordId) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.remove(`${RECORD_PREFIX}${recordId}`, () => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
         } else {
@@ -285,6 +328,36 @@
 
     footer.appendChild(saveBtn);
     footer.appendChild(statusEl);
+
+    // 削除ボタン（既存コメントがある場合のみ表示）
+    if (hasComment) {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'cc-delete-btn';
+      deleteBtn.textContent = '削除';
+      deleteBtn.addEventListener('click', async () => {
+        if (!confirm('このコメントを削除しますか？')) return;
+        try {
+          await deleteRecord(recordId);
+          // フォームをリセット
+          [movieStars, ...Object.values(screenRatings)].forEach((s) => {
+            s.dataset.value = '0';
+            s.querySelectorAll('.cc-star').forEach((el) => el.classList.remove('cc-star--on'));
+          });
+          movieTextarea.value = '';
+          screenTextarea.value = '';
+          // トグルを「追加する」状態に戻す
+          toggle.classList.remove('cc-toggle--has-data');
+          toggle.querySelector('.cc-toggle-label').textContent = '💬 コメントを追加する';
+          // パネルを閉じて削除ボタンを消す
+          body.classList.remove('cc-body--open');
+          toggle.querySelector('.cc-toggle-arrow').textContent = '▼';
+          deleteBtn.remove();
+        } catch (err) {
+          alert('削除に失敗しました: ' + err.message);
+        }
+      });
+      footer.appendChild(deleteBtn);
+    }
 
     body.appendChild(movieSec);
     body.appendChild(screenSec);

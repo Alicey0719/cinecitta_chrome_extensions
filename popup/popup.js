@@ -1,16 +1,46 @@
 'use strict';
 
-const STORAGE_KEY = 'cinecitta_comments_v1';
+const LEGACY_KEY = 'cinecitta_comments_v1'; // 旧 local storage キー（移行用）
+const RECORD_PREFIX = 'cc_r_';              // sync storage のレコードキープレフィックス
 
 // ============================================================
-// Storage
+// Storage — chrome.storage.sync を使用（Chrome アカウントで端末間同期）
 // ============================================================
 
 function loadAllData() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(STORAGE_KEY, (result) => {
-      const d = result[STORAGE_KEY];
-      resolve(d?.records ? d : { version: 1, records: {} });
+    chrome.storage.sync.get(null, (syncItems) => {
+      const records = {};
+      for (const [k, v] of Object.entries(syncItems || {})) {
+        if (k.startsWith(RECORD_PREFIX)) {
+          records[k.slice(RECORD_PREFIX.length)] = v;
+        }
+      }
+
+      if (Object.keys(records).length > 0) {
+        resolve({ version: 1, records });
+        return;
+      }
+
+      // sync が空 → 旧 local storage からマイグレーション
+      chrome.storage.local.get(LEGACY_KEY, (localResult) => {
+        const legacy = localResult[LEGACY_KEY];
+        if (!legacy?.records || Object.keys(legacy.records).length === 0) {
+          resolve({ version: 1, records: {} });
+          return;
+        }
+
+        const toSet = {};
+        for (const [id, rec] of Object.entries(legacy.records)) {
+          toSet[`${RECORD_PREFIX}${id}`] = rec;
+        }
+        chrome.storage.sync.set(toSet, () => {
+          if (!chrome.runtime.lastError) {
+            chrome.storage.local.remove(LEGACY_KEY);
+          }
+          resolve({ version: 1, records: legacy.records });
+        });
+      });
     });
   });
 }
@@ -169,12 +199,24 @@ function renderStats(records, screenFilter) {
 // 記録タブ: 映画ごとの評価一覧
 // ============================================================
 
+function deleteRecord(recordId) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.remove(`${RECORD_PREFIX}${recordId}`, () => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message));
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
 function renderRecords(records) {
   const container = document.getElementById('records-container');
   container.innerHTML = '';
 
-  const list = Object.values(records).sort(
-    (a, b) => new Date(b.updatedAt ?? 0) - new Date(a.updatedAt ?? 0)
+  const list = Object.entries(records).sort(
+    ([, a], [, b]) => new Date(b.updatedAt ?? 0) - new Date(a.updatedAt ?? 0)
   );
 
   if (!list.length) {
@@ -183,7 +225,7 @@ function renderRecords(records) {
     return;
   }
 
-  for (const rec of list) {
+  for (const [recordId, rec] of list) {
     const item = document.createElement('div');
     item.className = 'p-record';
 
@@ -193,7 +235,10 @@ function renderRecords(records) {
       : '未評価';
 
     item.innerHTML = `
-      <div class="p-record-title">${escHtml(rec.movieTitle ?? '不明')}</div>
+      <div class="p-record-header">
+        <div class="p-record-title">${escHtml(rec.movieTitle ?? '不明')}</div>
+        <button class="p-record-delete" title="削除">🗑</button>
+      </div>
       <div class="p-record-meta">
         ${escHtml(rec.viewingDate ?? '')}
         ${rec.screen ? `　${escHtml(rec.screen)}` : ''}
@@ -204,6 +249,20 @@ function renderRecords(records) {
         ? `<div class="p-record-comment">${escHtml(rec.movie.comment)}</div>`
         : ''}
     `;
+
+    item.querySelector('.p-record-delete').addEventListener('click', async () => {
+      if (!confirm(`「${rec.movieTitle ?? '不明'}」のコメントを削除しますか？`)) return;
+      try {
+        await deleteRecord(recordId);
+        item.remove();
+        if (!container.querySelector('.p-record')) {
+          container.innerHTML =
+            '<p class="p-empty"><span class="p-empty-icon">🎟️</span>まだ記録がありません。</p>';
+        }
+      } catch (err) {
+        showDataStatus(`削除失敗: ${err.message}`, true);
+      }
+    });
 
     container.appendChild(item);
   }
@@ -245,13 +304,13 @@ function importData(file) {
           throw new Error('無効なデータ形式です（"records" フィールドが必要です）');
         }
 
-        const current = await loadAllData();
-        const merged = {
-          version: 1,
-          records: { ...current.records, ...imported.records },
-        };
+        // 各レコードを sync storage に個別キーで書き込む
+        const toSet = {};
+        for (const [id, rec] of Object.entries(imported.records)) {
+          toSet[`${RECORD_PREFIX}${id}`] = rec;
+        }
 
-        chrome.storage.local.set({ [STORAGE_KEY]: merged }, () => {
+        chrome.storage.sync.set(toSet, () => {
           if (chrome.runtime.lastError) {
             reject(new Error(chrome.runtime.lastError.message));
           } else {
@@ -269,12 +328,16 @@ function importData(file) {
 
 function clearAllData() {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.remove(STORAGE_KEY, () => {
-      if (chrome.runtime.lastError) {
-        reject(new Error(chrome.runtime.lastError.message));
-      } else {
-        resolve();
-      }
+    chrome.storage.sync.get(null, (items) => {
+      const keys = Object.keys(items).filter((k) => k.startsWith(RECORD_PREFIX));
+      if (keys.length === 0) { resolve(); return; }
+      chrome.storage.sync.remove(keys, () => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve();
+        }
+      });
     });
   });
 }

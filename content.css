@@ -223,6 +223,23 @@
   cursor: default;
 }
 
+.cc-delete-btn {
+  padding: 5px 12px;
+  background: none;
+  border: 1px solid rgba(200, 64, 30, 0.35);
+  border-radius: 20px;
+  color: #c8401e;
+  font-size: 11px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.cc-delete-btn:hover {
+  background: rgba(200, 64, 30, 0.08);
+  border-color: rgba(200, 64, 30, 0.6);
+}
+
 .cc-status {
   font-size: 12px;
   opacity: 0;

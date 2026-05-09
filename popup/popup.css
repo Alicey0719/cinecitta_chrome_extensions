@@ -246,10 +246,35 @@ body {
   background: #fef5e8;
 }
 
+.p-record-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.p-record-delete {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 2px 6px;
+  background: none;
+  border: none;
+  color: #c8b090;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+}
+
+.p-record-delete:hover {
+  color: #c8401e;
+  background: rgba(200, 64, 30, 0.08);
+}
+
 .p-record-title {
   font-weight: 700;
   color: #2c1a0e;
-  margin-bottom: 3px;
   font-size: 13px;
   line-height: 1.4;
 }

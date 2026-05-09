@@ -1,17 +1,25 @@
 {
   "manifest_version": 3,
-  "name": "チネチッタ 購入履歴コメント",
-  "version": "0.0.1",
+  "name": "Cinecitta Mypage Mod",
+  "version": "0.0.2",
   "description": "チネチッタ購入履歴ページに映画・スクリーンへのコメントを追加できます",
-  "permissions": ["storage"],
+  "permissions": [
+    "storage"
+  ],
   "host_permissions": [
     "https://member.cinecitta.co.jp/*"
   ],
   "content_scripts": [
     {
-      "matches": ["https://member.cinecitta.co.jp/*"],
-      "js": ["content.js"],
-      "css": ["content.css"],
+      "matches": [
+        "https://member.cinecitta.co.jp/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
       "run_at": "document_idle"
     }
   ],
