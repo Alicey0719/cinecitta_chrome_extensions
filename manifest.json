@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "チネチッタ 購入履歴コメント",
+  "version": "0.0.1",
+  "description": "チネチッタ購入履歴ページに映画・スクリーンへのコメントを追加できます",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://member.cinecitta.co.jp/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://member.cinecitta.co.jp/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "購入履歴コメント",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

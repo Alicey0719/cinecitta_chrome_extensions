@@ -1,0 +1,375 @@
+/*
+ * チネチッタ購入履歴コメント — popup.css
+ * テーマ: Warm Cinema Light（映画プログラム・チケット風）
+ *   ベース     : ウォームクリーム (#fdf8f0)
+ *   アクセント  : シネマレッド (#c8401e)
+ *   サブ       : ゴールド (#b8860b)
+ *   テキスト   : ウォームダークブラウン (#2c1a0e)
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 460px;
+  min-height: 280px;
+  background: #fdf8f0;
+  color: #2c1a0e;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans',
+    sans-serif;
+  font-size: 13px;
+}
+
+/* ============================================================
+   ヘッダー
+   ============================================================ */
+
+.p-header {
+  padding: 13px 16px 11px;
+  background: #2c1a0e;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.p-header-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.p-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f5e4c0;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   タブ
+   ============================================================ */
+
+.p-tabs {
+  display: flex;
+  background: #fff9f0;
+  border-bottom: 2px solid #f0e4cc;
+}
+
+.p-tab {
+  flex: 1;
+  padding: 9px 6px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: #a08060;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.p-tab:hover {
+  color: #6a3a1a;
+}
+
+.p-tab--active {
+  color: #c8401e;
+  border-bottom-color: #c8401e;
+  font-weight: 700;
+}
+
+.p-tab-content {
+  display: none;
+  padding: 14px;
+  max-height: 460px;
+  overflow-y: auto;
+  background: #fdf8f0;
+}
+
+.p-tab-content--active {
+  display: block;
+}
+
+.p-tab-content::-webkit-scrollbar {
+  width: 5px;
+}
+.p-tab-content::-webkit-scrollbar-track {
+  background: #f5ede0;
+}
+.p-tab-content::-webkit-scrollbar-thumb {
+  background: rgba(200, 64, 30, 0.25);
+  border-radius: 3px;
+}
+
+/* ============================================================
+   フィルター行
+   ============================================================ */
+
+.p-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 8px 10px;
+  background: #fff5e6;
+  border-radius: 6px;
+  border: 1px solid #e8d4b0;
+}
+
+.p-filter-label {
+  font-size: 12px;
+  color: #8a6040;
+  white-space: nowrap;
+}
+
+.p-select {
+  flex: 1;
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #d8c090;
+  border-radius: 4px;
+  color: #3a2010;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+.p-select:focus {
+  border-color: #c8401e;
+}
+
+/* ============================================================
+   統計セクション
+   ============================================================ */
+
+.p-stats-section {
+  margin-bottom: 20px;
+}
+
+.p-screen-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #c8401e;
+  margin-bottom: 8px;
+  padding-left: 10px;
+  border-left: 3px solid #c8401e;
+}
+
+.p-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e8d4b0;
+}
+
+.p-table th {
+  padding: 7px 8px;
+  background: #3a2010;
+  color: #f5e4c0;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.p-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #f0e4cc;
+  vertical-align: top;
+  color: #3a2010;
+}
+
+.p-table tbody tr:nth-child(even) td {
+  background: #fdf5e8;
+}
+
+.p-table tbody tr:hover td {
+  background: #ffeedd;
+}
+
+.p-seat {
+  font-weight: 700;
+  color: #c8401e;
+  letter-spacing: 0.04em;
+}
+
+.p-stars {
+  color: #b8860b;
+  letter-spacing: 1px;
+}
+
+.p-avg {
+  color: #8a6040;
+  font-size: 11px;
+  margin-left: 2px;
+}
+
+.p-no-data {
+  color: #c8b898;
+}
+
+.p-comment-row td {
+  padding: 3px 8px 9px;
+  background: #fef9f2;
+}
+
+.p-comment-text {
+  font-size: 11px;
+  color: #7a5030;
+  line-height: 1.6;
+  margin-bottom: 2px;
+  padding-left: 8px;
+  border-left: 2px solid #d4a030;
+}
+
+/* ============================================================
+   記録カード
+   ============================================================ */
+
+.p-record {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: #fff;
+  border: 1px solid #e8d4b0;
+  border-left: 3px solid #c8401e;
+  border-radius: 0 6px 6px 0;
+  transition: background 0.12s;
+}
+
+.p-record:hover {
+  background: #fef5e8;
+}
+
+.p-record-title {
+  font-weight: 700;
+  color: #2c1a0e;
+  margin-bottom: 3px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.p-record-meta {
+  font-size: 11px;
+  color: #9a7050;
+  margin-bottom: 5px;
+}
+
+.p-record-rating {
+  font-size: 12px;
+  color: #6a4020;
+  margin-bottom: 3px;
+}
+
+.p-stars-small {
+  color: #b8860b;
+  letter-spacing: 1px;
+}
+
+.p-record-comment {
+  font-size: 12px;
+  color: #6a4020;
+  margin-top: 5px;
+  padding: 6px 10px;
+  background: #fdf5e8;
+  border-radius: 4px;
+  line-height: 1.6;
+  border-left: 2px solid #d4a030;
+}
+
+/* ============================================================
+   データ管理
+   ============================================================ */
+
+.p-data-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.p-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid #d8c090;
+  border-radius: 6px;
+  color: #4a2a10;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+  width: 100%;
+}
+
+.p-btn:hover {
+  background: #fff5e6;
+  border-color: #c8a060;
+}
+
+.p-btn--danger {
+  color: #a02010;
+  border-color: #e0b0a0;
+}
+
+.p-btn--danger:hover {
+  background: #fff0ec;
+  border-color: #c8401e;
+}
+
+.p-divider {
+  border: none;
+  border-top: 1px solid #e8d4b0;
+  margin: 4px 0;
+}
+
+.p-data-note {
+  font-size: 11px;
+  color: #9a7050;
+  line-height: 1.7;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #fff9f0;
+  border-radius: 5px;
+  border: 1px solid #e8d4b0;
+  border-left: 3px solid #d4a030;
+}
+
+.p-data-status {
+  min-height: 18px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.p-data-status--ok {
+  color: #3a8a40;
+}
+
+.p-data-status--err {
+  color: #c8401e;
+}
+
+/* ============================================================
+   空状態
+   ============================================================ */
+
+.p-empty {
+  color: #c8b090;
+  font-size: 12px;
+  line-height: 1.8;
+  text-align: center;
+  padding: 28px 0;
+}
+
+.p-empty-icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}

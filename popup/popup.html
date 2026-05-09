@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>購入履歴コメント</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="p-container">
+    <div class="p-header">
+      <span class="p-header-icon">🎬</span>
+      <h1 class="p-title">チネチッタ コメント管理</h1>
+    </div>
+
+    <div class="p-tabs">
+      <button class="p-tab p-tab--active" data-tab="stats">📊 統計</button>
+      <button class="p-tab" data-tab="records">🎟️ 記録</button>
+      <button class="p-tab" data-tab="data">⚙️ データ管理</button>
+    </div>
+
+    <!-- 統計タブ -->
+    <div id="tab-stats" class="p-tab-content p-tab-content--active">
+      <div class="p-filter-row">
+        <label class="p-filter-label">スクリーン:</label>
+        <select id="screen-filter" class="p-select">
+          <option value="">すべて</option>
+        </select>
+      </div>
+      <div id="stats-container"></div>
+    </div>
+
+    <!-- 記録タブ -->
+    <div id="tab-records" class="p-tab-content">
+      <div id="records-container"></div>
+    </div>
+
+    <!-- データ管理タブ -->
+    <div id="tab-data" class="p-tab-content">
+      <div class="p-data-actions">
+        <button id="export-btn" class="p-btn">📤 JSONでエクスポート</button>
+        <button id="import-btn" class="p-btn">📥 JSONをインポート（マージ）</button>
+        <input id="import-file" type="file" accept=".json" style="display:none">
+        <hr class="p-divider">
+        <button id="clear-btn" class="p-btn p-btn--danger">🗑️ 全データを削除</button>
+      </div>
+      <p class="p-data-note">
+        データはこのブラウザのローカルストレージに保存されます。<br>
+        エクスポートで JSON ファイルに書き出し、別のブラウザや PC にインポートできます。<br>
+        インポートは既存データとマージされます（同一レコードは上書き）。
+      </p>
+      <div id="data-status" class="p-data-status"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
