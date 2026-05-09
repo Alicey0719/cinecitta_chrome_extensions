@@ -103,6 +103,10 @@
   function loadAllData() {
     return new Promise((resolve) => {
       chrome.storage.sync.get(null, (syncItems) => {
+        if (chrome.runtime.lastError) {
+          resolve({ version: 1, records: {} });
+          return;
+        }
         const records = {};
         for (const [k, v] of Object.entries(syncItems || {})) {
           if (k.startsWith(RECORD_PREFIX)) {
@@ -425,6 +429,18 @@
     }
   });
   observer.observe(document.body, { childList: true, subtree: true });
+
+  // sync データが後から届いたときにパネルを再描画する
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'sync') return;
+    if (!Object.keys(changes).some((k) => k.startsWith(RECORD_PREFIX))) return;
+    if (!isHistoryPage()) return;
+    document.querySelectorAll(`[${PROCESSED_ATTR}]`).forEach((el) => {
+      el.removeAttribute(PROCESSED_ATTR);
+      el.querySelector('.cc-panel')?.remove();
+    });
+    scheduleProcess();
+  });
 
   // history.pushState を Wrap して SPA ナビゲーションに追随
   const _pushState = history.pushState.bind(history);
